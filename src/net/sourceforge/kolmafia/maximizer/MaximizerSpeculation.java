@@ -349,12 +349,11 @@ public class MaximizerSpeculation extends Speculation
         if (group != null && this.foldables) {
           String groupName = group.names.get(0);
           for (var slot : SlotSet.SLOTS) {
-            if (slot != Slot.FAMILIAR && this.equipment.get(slot) != null) {
-              FoldGroup groupEquipped =
-                  ItemDatabase.getFoldGroup(this.equipment.get(slot).getName());
-              if (groupEquipped != null && groupName.equals(groupEquipped.names.get(0))) {
-                --count;
-              }
+            if (slot == Slot.FAMILIAR || this.equipment.get(slot) == null) continue;
+            FoldGroup groupEquipped =
+                    ItemDatabase.getFoldGroup(this.equipment.get(slot).getName());
+            if (groupEquipped != null && groupName.equals(groupEquipped.names.get(0))) {
+              --count;
             }
           }
         }
@@ -385,41 +384,39 @@ public class MaximizerSpeculation extends Speculation
     if (this.equipment.get(Slot.CONTAINER) == null) {
       List<CheckedItem> possible = possibles.get(Slot.CONTAINER);
       boolean any = false;
-      for (int pos = 0; pos < possible.size(); ++pos) {
+        for (int pos = 0; pos < possible.size(); ++pos) {
         CheckedItem item = possible.get(pos);
         int count = item.getCount();
         FoldGroup group = ItemDatabase.getFoldGroup(item.getName());
         if (group != null && this.foldables) {
           String groupName = group.names.get(0);
           for (var slot : SlotSet.SLOTS) {
-            if (slot != Slot.CONTAINER && this.equipment.get(slot) != null) {
-              FoldGroup groupEquipped =
-                  ItemDatabase.getFoldGroup(this.equipment.get(slot).getName());
-              if (groupEquipped != null && groupName.equals(groupEquipped.names.get(0))) {
-                --count;
-              }
+            if (slot == Slot.CONTAINER || this.equipment.get(slot) == null) continue;
+            FoldGroup groupEquipped =
+                ItemDatabase.getFoldGroup(this.equipment.get(slot).getName());
+            if (groupEquipped != null && groupName.equals(groupEquipped.names.get(0))) {
+              --count;
             }
           }
         }
         if (count <= 0) continue;
         this.equipment.put(Slot.CONTAINER, item);
+        any = true;
         if (item.getItemId() == ItemPool.BUDDY_BJORN) {
           if (useBjornFamiliar != null) {
             this.setBjorned(useBjornFamiliar);
             this.tryAccessories(enthronedFamiliars, possibles, 0, bestCard, useCrownFamiliar);
-            any = true;
             this.restore(mark);
           } else {
+            if (enthronedFamiliars.isEmpty()) any = false;
             for (FamiliarData f : enthronedFamiliars) {
               this.setBjorned(f);
               this.tryAccessories(enthronedFamiliars, possibles, 0, bestCard, useCrownFamiliar);
-              any = true;
               this.restore(mark);
             }
           }
         } else {
           this.tryAccessories(enthronedFamiliars, possibles, 0, bestCard, useCrownFamiliar);
-          any = true;
           this.restore(mark);
         }
       }
@@ -532,24 +529,24 @@ public class MaximizerSpeculation extends Speculation
         if (group != null && this.foldables) {
           String groupName = group.names.get(0);
           for (var slot : SlotSet.SLOTS) {
-            if (slot != Slot.HAT && this.equipment.get(slot) != null) {
-              FoldGroup groupEquipped =
-                  ItemDatabase.getFoldGroup(this.equipment.get(slot).getName());
-              if (groupEquipped != null && groupName.equals(groupEquipped.names.get(0))) {
-                --count;
-              }
+            if (slot == Slot.HAT || this.equipment.get(slot) == null) continue;
+            FoldGroup groupEquipped =
+                ItemDatabase.getFoldGroup(this.equipment.get(slot).getName());
+            if (groupEquipped != null && groupName.equals(groupEquipped.names.get(0))) {
+              --count;
             }
           }
         }
         if (count <= 0) continue;
         this.equipment.put(Slot.HAT, item);
+        any = true;
         if (item.getItemId() == ItemPool.HATSEAT) {
           if (useCrownFamiliar != null) {
             this.setEnthroned(useCrownFamiliar);
             this.tryShirts(possibles, bestCard);
-            any = true;
             this.restore(mark);
           } else {
+            if (enthronedFamiliars.isEmpty()) any = false;
             for (FamiliarData f : enthronedFamiliars) {
               // Cannot use same familiar for this and Bjorn
               if (f != this.getBjorned() || f == FamiliarData.NO_FAMILIAR) {
@@ -562,7 +559,6 @@ public class MaximizerSpeculation extends Speculation
           }
         } else {
           this.tryShirts(possibles, bestCard);
-          any = true;
           this.restore(mark);
         }
       }
@@ -592,12 +588,11 @@ public class MaximizerSpeculation extends Speculation
           if (group != null && this.foldables) {
             String groupName = group.names.get(0);
             for (var slot : SlotSet.SLOTS) {
-              if (slot != Slot.SHIRT && this.equipment.get(slot) != null) {
-                FoldGroup groupEquipped =
-                    ItemDatabase.getFoldGroup(this.equipment.get(slot).getName());
-                if (groupEquipped != null && groupName.equals(groupEquipped.names.get(0))) {
-                  --count;
-                }
+              if (slot == Slot.SHIRT || this.equipment.get(slot) == null) continue;
+              FoldGroup groupEquipped =
+                  ItemDatabase.getFoldGroup(this.equipment.get(slot).getName());
+              if (groupEquipped != null && groupName.equals(groupEquipped.names.get(0))) {
+                --count;
               }
             }
           }
@@ -633,12 +628,11 @@ public class MaximizerSpeculation extends Speculation
         if (group != null && this.foldables) {
           String groupName = group.names.get(0);
           for (var slot : SlotSet.SLOTS) {
-            if (slot != Slot.PANTS && this.equipment.get(slot) != null) {
-              FoldGroup groupEquipped =
-                  ItemDatabase.getFoldGroup(this.equipment.get(slot).getName());
-              if (groupEquipped != null && groupName.equals(groupEquipped.names.get(0))) {
-                --count;
-              }
+            if (slot == Slot.PANTS || this.equipment.get(slot) == null) continue;
+            FoldGroup groupEquipped =
+                ItemDatabase.getFoldGroup(this.equipment.get(slot).getName());
+            if (groupEquipped != null && groupName.equals(groupEquipped.names.get(0))) {
+              --count;
             }
           }
         }
@@ -711,12 +705,11 @@ public class MaximizerSpeculation extends Speculation
         if (group != null && this.foldables) {
           String groupName = group.names.get(0);
           for (var slot : SlotSet.SLOTS) {
-            if (slot != Slot.WEAPON && this.equipment.get(slot) != null) {
-              FoldGroup groupEquipped =
-                  ItemDatabase.getFoldGroup(this.equipment.get(slot).getName());
-              if (groupEquipped != null && groupName.equals(groupEquipped.names.get(0))) {
-                --count;
-              }
+            if (slot == Slot.WEAPON || this.equipment.get(slot) == null) continue;
+            FoldGroup groupEquipped =
+                ItemDatabase.getFoldGroup(this.equipment.get(slot).getName());
+            if (groupEquipped != null && groupName.equals(groupEquipped.names.get(0))) {
+              --count;
             }
           }
         }
@@ -777,12 +770,11 @@ public class MaximizerSpeculation extends Speculation
         if (group != null && this.foldables) {
           String groupName = group.names.get(0);
           for (var slot : SlotSet.SLOTS) {
-            if (slot != Slot.OFFHAND && this.equipment.get(slot) != null) {
-              FoldGroup groupEquipped =
-                  ItemDatabase.getFoldGroup(this.equipment.get(slot).getName());
-              if (groupEquipped != null && groupName.equals(groupEquipped.names.get(0))) {
-                --count;
-              }
+            if (slot == Slot.OFFHAND || this.equipment.get(slot) == null) continue;
+            FoldGroup groupEquipped =
+                ItemDatabase.getFoldGroup(this.equipment.get(slot).getName());
+            if (groupEquipped != null && groupName.equals(groupEquipped.names.get(0))) {
+              --count;
             }
           }
         }
