@@ -1424,12 +1424,6 @@ public abstract class KoLCharacter {
     KoLCharacter.limitMode = limitmode;
   }
 
-  private static boolean isPseudoLimitMode() {
-    return KoLCharacter.limitMode == LimitMode.BIRD
-            || KoLCharacter.limitMode == LimitMode.ROACH
-            || KoLCharacter.limitMode == LimitMode.MOLE;
-  }
-
   public static void setLimitMode(final String name) {
     setLimitMode(LimitMode.find(name));
   }
