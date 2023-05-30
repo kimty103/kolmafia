@@ -41,21 +41,16 @@ public class CheckedItem extends AdventureResult {
       if (group != null) {
         for (int i = 0; i < group.names.size(); ++i) {
           String form = group.names.get(i);
-          if (!form.equals(itemName)) {
-            int foldItemId = ItemDatabase.getItemId(form);
-            int count = InventoryManager.getAccessibleCount(foldItemId);
-            this.foldable += count;
-            if (count > 0) {
-              this.foldItemId = foldItemId;
-            }
-          }
+          if(form.equals(itemName)) continue;
+          int foldItemId = ItemDatabase.getItemId(form);
+          int count = InventoryManager.getAccessibleCount(foldItemId);
+          this.foldable += count;
+          this.foldItemId = count > 0 ? foldItemId : this.foldItemId;
         }
         // Cannot have more than one item from January's Garbage Tote, no matter how many you have
         // Fold groups are stored in lower case
         if (group.names.get(0).equals("january's garbage tote")) {
-          if (this.foldable + this.initial > 1) {
-            this.foldable = 1 - this.initial;
-          }
+          this.foldable = (this.foldable + this.initial > 1) ? 1 - this.initial : this.foldable;
         }
       }
     }
@@ -78,9 +73,7 @@ public class CheckedItem extends AdventureResult {
     } else if (c.price > 0) {
       this.npcBuyable = maxPrice / c.price;
       int limit = CheckedItem.limitBuyable(itemId);
-      if (limit < this.npcBuyable) {
-        this.npcBuyable = limit;
-      }
+      this.npcBuyable = (limit < this.npcBuyable) ? limit : this.npcBuyable;
     }
 
     if (this.getCount() >= 3 || equipScope != EquipScope.SPECULATE_ANY) {
@@ -135,17 +128,13 @@ public class CheckedItem extends AdventureResult {
               AdventureResult foldItem = ItemPool.get(foldItemId);
               int count = foldItem.getCount(KoLConstants.storage);
               this.pullfoldable += count;
-              if (count > 0) {
-                this.foldItemId = foldItemId;
-              }
+              this.foldItemId = (count > 0) ? foldItemId : this.foldItemId;
             }
           }
           // Cannot have more than one item from January's Garbage Tote, no matter how many you
           // have
           if (group.names.get(0).equals("january's garbage tote")) {
-            if (this.pullfoldable > 1) {
-              this.pullfoldable = 1;
-            }
+            this.pullfoldable = (this.pullfoldable > 1) ? 1 : this.pullfoldable;
           }
         }
       }
