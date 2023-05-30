@@ -162,15 +162,9 @@ public class PokefamData implements Comparable<PokefamData> {
 
   private static int level2Power(final String level) {
     if (level != null && level.length() > 0) {
-      switch (level.charAt(0)) {
-        case '1':
-          return 1;
-        case '2':
-          return 2;
-        case '3':
-          return 3;
-        case '4':
-          return 4;
+      int power = Character.getNumericValue(level.charAt(0));
+      if (power > 0 && power < 5) {
+        return power;
       }
     }
     return 0;
@@ -178,17 +172,9 @@ public class PokefamData implements Comparable<PokefamData> {
 
   private static int level2HP(final String level) {
     if (level != null && level.length() > 2) {
-      switch (level.charAt(2)) {
-        case '1':
-          return 1;
-        case '2':
-          return 2;
-        case '3':
-          return 3;
-        case '4':
-          return 4;
-        case '5':
-          return 5;
+      int hp = Character.getNumericValue(level.charAt(2));
+      if (hp > 0 && hp < 6) {
+        return hp;
       }
     }
     return 0;
