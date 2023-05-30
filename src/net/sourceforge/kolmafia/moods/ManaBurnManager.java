@@ -21,54 +21,11 @@ public class ManaBurnManager {
   private ManaBurnManager() {}
 
   public static final void burnExtraMana(final boolean isManualInvocation) {
-    if (KoLmafia.refusesContinue()
-        || KoLCharacter.inZombiecore()
-        || KoLCharacter.getLimitMode().limitRecovery()) {
-      return;
-    }
-
-    String nextBurnCast;
-
-    float manaBurnTrigger = Preferences.getFloat("manaBurningTrigger");
-    if (!isManualInvocation
-        && KoLCharacter.getCurrentMP() < (int) (manaBurnTrigger * KoLCharacter.getMaximumMP())) {
-      return;
-    }
-
-    boolean was = MoodManager.isExecuting;
-    MoodManager.isExecuting = true;
-
-    long currentMP = -1;
-
-    while (currentMP != KoLCharacter.getCurrentMP()
-        && (nextBurnCast = ManaBurnManager.getNextBurnCast()) != null) {
-      currentMP = KoLCharacter.getCurrentMP();
-      KoLmafiaCLI.DEFAULT_SHELL.executeLine(nextBurnCast);
-    }
-
-    MoodManager.isExecuting = was;
+      new ExtraManaBurn().run(isManualInvocation);
   }
 
-  public static final void burnMana(long minimum) {
-    if (KoLCharacter.inZombiecore()) {
-      return;
-    }
-
-    String nextBurnCast;
-
-    boolean was = MoodManager.isExecuting;
-    MoodManager.isExecuting = true;
-
-    minimum = Math.max(0, minimum);
-    long currentMP = -1;
-
-    while (currentMP != KoLCharacter.getCurrentMP()
-        && (nextBurnCast = ManaBurnManager.getNextBurnCast(minimum)) != null) {
-      currentMP = KoLCharacter.getCurrentMP();
-      KoLmafiaCLI.DEFAULT_SHELL.executeLine(nextBurnCast);
-    }
-
-    MoodManager.isExecuting = was;
+  public static final void burnMana(final long minimum) {
+    new NormalManaBurn().run(minimum);
   }
 
   public static final String getNextBurnCast() {
@@ -88,7 +45,7 @@ public class ManaBurnManager {
     return ManaBurnManager.getNextBurnCast(minimum);
   }
 
-  private static String getNextBurnCast(final long minimum) {
+  public static String getNextBurnCast(final long minimum) {
     // Punt immediately if already burned enough or must recover MP
 
     long allowedMP = KoLCharacter.getCurrentMP() - minimum;
