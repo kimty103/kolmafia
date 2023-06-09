@@ -224,6 +224,16 @@ public class FamiliarDataTest {
     AdventureResult result = familiar.findGoodItem(true);
     assertEquals(familiar.LEAD_NECKLACE, result);
   }
+
+  @Test
+  public void isCombatFamiliarWhenEquipWhipTest() {
+    var familiar = FamiliarData.registerFamiliar(FamiliarPool.DANDY_LION, 0);
+    AdventureResult item = ItemPool.get(ItemPool.PIXEL_WHIP, 1);
+    EquipmentManager.setEquipment(Slot.WEAPON, item);
+    familiar.setItem(item);
+    assertTrue(familiar.isCombatFamiliar());
+  }
+
   @Nested
   class Terrarium {
     @BeforeAll
