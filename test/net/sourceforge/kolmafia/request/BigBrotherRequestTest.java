@@ -7,13 +7,19 @@ import static internal.helpers.Player.withProperty;
 import static internal.helpers.Player.withQuestProgress;
 import static internal.matchers.Preference.isSetTo;
 import static internal.matchers.Quest.isStep;
+import static net.sourceforge.kolmafia.request.BigBrotherRequest.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 import internal.helpers.Cleanups;
 import internal.network.FakeHttpClientBuilder;
 import net.sourceforge.kolmafia.AscensionClass;
+import net.sourceforge.kolmafia.CoinmasterData;
 import net.sourceforge.kolmafia.KoLCharacter;
+import net.sourceforge.kolmafia.KoLConstants;
 import net.sourceforge.kolmafia.KoLConstants.Stat;
+import net.sourceforge.kolmafia.objectpool.ItemPool;
+import net.sourceforge.kolmafia.persistence.ItemDatabase;
 import net.sourceforge.kolmafia.persistence.QuestDatabase;
 import net.sourceforge.kolmafia.persistence.QuestDatabase.Quest;
 import net.sourceforge.kolmafia.preferences.Preferences;
@@ -23,6 +29,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+
+import java.util.List;
 
 public class BigBrotherRequestTest {
 
@@ -34,6 +42,32 @@ public class BigBrotherRequestTest {
   @BeforeEach
   public void beforeEach() {
     Preferences.reset("Big Brother");
+  }
+
+  @Test
+  void canBuyItemTest() {
+    CoinmasterData dataForTrueTest = BigBrotherRequest.BIG_BROTHER;
+
+    List<Integer> items = List.of(ItemPool.MADNESS_REEF_MAP, ItemPool.DAMP_OLD_BOOT, ItemPool.BLACK_GLASS);
+
+    for(Integer item : items) {
+      assertThat(dataForTrueTest.canBuyItem(item), is(true));
+    }
+
+    KoLConstants.inventory.add(BLACK_GLASS);
+    Preferences.setBoolean("mapToMadnessReefPurchased", true);
+    Preferences.setBoolean("dampOldBootPurchased", true);
+
+    CoinmasterData dataForFalseTest = BigBrotherRequest.BIG_BROTHER;
+
+    for(Integer item : items) {
+      System.out.println(item);
+
+      assertThat(dataForFalseTest.canBuyItem(item), is(false));
+    }
+
+    assertThat(dataForFalseTest.canBuyItem(ItemPool.FOLDER_19), is(false));
+    assertThat(dataForFalseTest.canBuyItem(ItemPool.HOUSE), is(false));
   }
 
   @Nested
@@ -52,6 +86,8 @@ public class BigBrotherRequestTest {
           withProperty("mapToTheDiveBarPurchased", false),
           withProperty("mapToTheMarinaraTrenchPurchased", false),
           withProperty("mapToTheSkateParkPurchased", false));
+
+
     }
 
     @Test
