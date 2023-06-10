@@ -759,7 +759,6 @@ public class AreaCombatData {
     addEncounterHTML(buffer, "Lucky:", EncounterType.LUCKY);
     addEncounterHTML(buffer, "Hobo Glyph:", EncounterType.GLYPH);
 
-
     if (KoLCharacter.inAxecore()) {
       addEncounterHTML(buffer, "Clancy:", EncounterType.BORIS);
     }

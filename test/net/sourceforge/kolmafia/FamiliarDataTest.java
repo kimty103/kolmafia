@@ -3,7 +3,6 @@ package net.sourceforge.kolmafia;
 import static internal.helpers.Networking.html;
 import static internal.helpers.Networking.json;
 import static internal.helpers.Player.*;
-import static internal.helpers.Player.withFamiliarInTerrariumWithItem;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;

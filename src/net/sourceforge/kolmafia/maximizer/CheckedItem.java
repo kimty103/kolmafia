@@ -41,7 +41,7 @@ public class CheckedItem extends AdventureResult {
       if (group != null) {
         for (int i = 0; i < group.names.size(); ++i) {
           String form = group.names.get(i);
-          if(form.equals(itemName)) continue;
+          if (form.equals(itemName)) continue;
           int foldItemId = ItemDatabase.getItemId(form);
           int count = InventoryManager.getAccessibleCount(foldItemId);
           this.foldable += count;
