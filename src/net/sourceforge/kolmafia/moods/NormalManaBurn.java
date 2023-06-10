@@ -12,7 +12,7 @@ public class NormalManaBurn extends ManaBurnStatement {
 
   @Override
   public void afterManaBurn(Object minimumNumber) {
-    int minimum = Math.max(0, (int) minimumNumber);
+    int minimum = Math.max(0, ((Long) minimumNumber).intValue());
     String nextBurnCast;
     long currentMP = -1;
 
