@@ -1378,6 +1378,7 @@ public class ResultProcessor {
         // Speakeasy currencies
       case ItemPool.MILK_CAP:
       case ItemPool.DRINK_CHIT:
+      case ItemPool.REPLICA_MR_ACCESSORY:
         NamedListenerRegistry.fireChange("(coinmaster)");
         break;
 
@@ -3284,6 +3285,7 @@ public class ResultProcessor {
         break;
 
       case ItemPool.POWERFUL_GLOVE:
+      case ItemPool.REPLICA_POWERFUL_GLOVE:
         InventoryManager.addPowerfulGloveSkills();
         break;
 
@@ -3332,6 +3334,7 @@ public class ResultProcessor {
         break;
 
       case ItemPool.DESIGNER_SWEATPANTS:
+      case ItemPool.REPLICA_DESIGNER_SWEATPANTS:
         InventoryManager.addDesignerSweatpantsSkills();
         break;
 
@@ -3372,6 +3375,7 @@ public class ResultProcessor {
         break;
 
       case ItemPool.CINCHO_DE_MAYO:
+      case ItemPool.REPLICA_CINCHO_DE_MAYO:
         InventoryManager.addCinchoDeMayoSkills();
         break;
     }

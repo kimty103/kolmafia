@@ -1752,12 +1752,15 @@ public abstract class KoLCharacter {
     if (KoLCharacter.hasSkill(SkillPool.FOOD_COMA)) freerests += 10;
     if (KoLCharacter.hasSkill(SkillPool.DOG_TIRED)) freerests += 5;
     if (KoLConstants.chateau.contains(ChateauRequest.CHATEAU_FAN)) freerests += 5;
-    if (Preferences.getBoolean("getawayCampsiteUnlocked")) ++freerests;
+    if (StandardRequest.isAllowed(RestrictedItemType.ITEMS, "Distant Woods Getaway Brochure")
+        && Preferences.getBoolean("getawayCampsiteUnlocked")) ++freerests;
     if (KoLCharacter.hasSkill(SkillPool.LONG_WINTERS_NAP)) freerests += 5;
     if (InventoryManager.getCount(ItemPool.MOTHERS_NECKLACE) > 0
         || KoLCharacter.hasEquipped(ItemPool.MOTHERS_NECKLACE)) freerests += 5;
     if (InventoryManager.getCount(ItemPool.CINCHO_DE_MAYO) > 0
         || KoLCharacter.hasEquipped(ItemPool.CINCHO_DE_MAYO)) freerests += 3;
+    if (InventoryManager.getCount(ItemPool.REPLICA_CINCHO_DE_MAYO) > 0
+        || KoLCharacter.hasEquipped(ItemPool.REPLICA_CINCHO_DE_MAYO)) freerests += 3;
     return freerests;
   }
 
@@ -3015,6 +3018,15 @@ public abstract class KoLCharacter {
       KoLCharacter.resetSkills();
     }
 
+    // Reset Legacy of Loathing stuff
+    if (oldPath == Path.LEGACY_OF_LOATHING) {
+      Preferences.resetToDefault("replicaChateauAvailable");
+      Preferences.resetToDefault("replicaNeverendingPartyAlways");
+
+      // if replica emotion chipped
+      KoLCharacter.resetSkills();
+    }
+
     // If we were in Hardcore or a path that alters skills, automatically recall skills
     if (restricted
         || wasInHardcore
@@ -3447,6 +3459,10 @@ public abstract class KoLCharacter {
 
   public static final boolean inShadowsOverLoathing() {
     return KoLCharacter.ascensionPath == Path.SHADOWS_OVER_LOATHING;
+  }
+
+  public static final boolean inLegacyOfLoathing() {
+    return KoLCharacter.ascensionPath == Path.LEGACY_OF_LOATHING;
   }
 
   public static final boolean isUnarmed() {
@@ -5651,7 +5667,7 @@ public abstract class KoLCharacter {
             newModifiers.add(ModifierDatabase.getItemModifiers(card.getItemId()));
           }
         }
-        case ItemPool.FOLDER_HOLDER ->
+        case ItemPool.FOLDER_HOLDER, ItemPool.REPLICA_FOLDER_HOLDER ->
         // Apply folders
         SlotSet.FOLDER_SLOTS.stream()
             .map(equipment::get)

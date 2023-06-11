@@ -408,6 +408,13 @@ user	checkJackassHardcore	true
 user	checkJackassSoftcore	true
 user	chefTurnsUsed	0
 user	chessboardsCleared	0
+user	chibiAlignment	0
+user	chibiBirthday	-1
+user	chibiFitness	0
+user	chibiIntelligence	0
+user	chibiLastVisit	-1
+user	chibiName
+user	chibiSocialization	0
 user	chilledToTheBone	0
 user	choiceAdventureScript
 user	chosenTrip
@@ -954,6 +961,7 @@ user	latteUnlocks	cinnamon,pumpkin,vanilla
 user	lawOfAveragesAvailable	true
 user	lawOfAveragesCost	1000
 user	leafletCompleted	false
+user	legacyPoints	0
 user	libramSkillsHardcore	none
 user	libramSkillsSoftcore	none
 user	libramSummons	0
@@ -1075,6 +1083,7 @@ user	nextQuantumFamiliarName
 user	nextQuantumFamiliarOwner
 user	nextQuantumFamiliarOwnerId	0
 user	nextQuantumFamiliarTurn	0
+user	noncombatForcerActive	false
 user	noobPoints	0
 user	noobDeferredPoints	0
 user	noodleSummons	0
@@ -1156,6 +1165,9 @@ user	promptAboutCrafting	1
 user	puzzleChampBonus	5
 user	pyramidPosition	1
 user	pyramidBombUsed	false
+user	replicaChateauAvailable	false
+user	replicaNeverendingPartyAlways	false
+user	replicaWitchessSetAvailable	false
 user	retroCapeSuperhero	vampire
 user	retroCapeWashingInstructions	hold
 user	rockinRobinProgress	25
@@ -1682,6 +1694,8 @@ user	_chateauDeskHarvested	false
 user	_chateauMonsterFought	false
 user	_cheerleaderSteam	200
 user	_chestXRayUsed	0
+user	_chibiAdventures	0
+user	_chibiChanged	false
 user	_chipBags	0
 user	_chocolateCigarsUsed	0
 user	_chocolateCoveredPingPongBallsUsed	0
@@ -2112,6 +2126,9 @@ user	_raveStealCount	0
 user	_redwoodRainStickUsed	false
 user	_reflexHammerUsed	0
 user	_relativityMonster	false
+user	_replicaSnowconeTomeUsed	false
+user	_replicaResolutionLibramUsed	false
+user	_replicaSmithsTomeUsed	false
 user	_requestSandwichSucceeded	false
 user	_resolutionAdv	0
 user	_resolutionRareSummons	0

@@ -4,10 +4,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Color;
+
+import java.util.List;
+
 import java.util.regex.Pattern;
 import net.sourceforge.kolmafia.preferences.Preferences;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 public class ChatFormatterTest {
   @BeforeEach
@@ -73,11 +79,14 @@ public class ChatFormatterTest {
     String messageType = "testMessageType";
     String userId = "testUserId";
 
-    String hexColor = "\"#" + Integer.toHexString(ChatFormatter.getRandomColor().getRGB()).substring(2) + "\"";
+    String hexColor =
+        "\"#" + Integer.toHexString(ChatFormatter.getRandomColor().getRGB()).substring(2) + "\"";
 
-    Pattern CHAT_MESSAGE_PATTERN = Pattern.compile("who=" + sender + ".+>" + sender + "<.+: " + content);
+    Pattern CHAT_MESSAGE_PATTERN =
+        Pattern.compile("who=" + sender + ".+>" + sender + "<.+: " + content);
     Pattern SYSTEM_MESSAGE_PATTERN = Pattern.compile("who=-1.+>System Message<.+: " + content);
-    Pattern MODERATOR_MESSAGE_PATTERN = Pattern.compile("who=" + userId + ".+>" + messageType + "<.+: " + content);
+    Pattern MODERATOR_MESSAGE_PATTERN =
+        Pattern.compile("who=" + userId + ".+>" + messageType + "<.+: " + content);
     Pattern EVENT_MESSAGE_PATTERN = Pattern.compile("color=" + hexColor + ">" + content + "<");
 
     ChatMessage chatMessage = new ChatMessage();
@@ -89,33 +98,62 @@ public class ChatFormatterTest {
     chatMessage.setContent(content);
 
     assertTrue(CHAT_MESSAGE_PATTERN.matcher(ChatFormatter.formatChatMessage(chatMessage)).find());
-    assertTrue(SYSTEM_MESSAGE_PATTERN.matcher(ChatFormatter.formatChatMessage(systemMessage)).find());
-    assertTrue(MODERATOR_MESSAGE_PATTERN.matcher(ChatFormatter.formatChatMessage(moderatorMessage)).find());
+    assertTrue(
+        SYSTEM_MESSAGE_PATTERN.matcher(ChatFormatter.formatChatMessage(systemMessage)).find());
+    assertTrue(
+        MODERATOR_MESSAGE_PATTERN
+            .matcher(ChatFormatter.formatChatMessage(moderatorMessage))
+            .find());
     assertTrue(EVENT_MESSAGE_PATTERN.matcher(ChatFormatter.formatChatMessage(eventMessage)).find());
   }
 
-  @Test
-  public void addHightlightTest() {
-    Color black = Color.BLACK;
-    Color white = Color.WHITE;
+  @Nested
+  class addHighlightTest {
 
-    // Here we're testing if the messages are added correctly
-    ChatFormatter.addHighlighting("test case", black);
-    // The first highlight, this is intended to be overwritten
-    ChatFormatter.addHighlighting("a test", black);
-    // The second highlight, this is also intended to be overwritten
-    ChatFormatter.addHighlighting("test", black);
-    ChatFormatter.addHighlighting("a test with a long message", black);
-    // This should remove the second highlight and replace it
-    ChatFormatter.addHighlighting("a test", black);
-    // This should remove the first highlight and replace it with white
-    ChatFormatter.addHighlighting("test", white);
-    ChatFormatter.addHighlighting("the test", black);
 
-    String expected =
-        "test case\n#000000\na test with a long message\n#000000\na test\n#000000\ntest\n#ffffff\nthe test\n#000000";
+    @Test
+    public void addHighlightWithColor() {
+      Color black = Color.BLACK;
+      Color white = Color.WHITE;
 
-    assertEquals(expected, Preferences.getString("highlightList"));
+      // Here we're testing if the messages are added correctly
+      ChatFormatter.addHighlighting("test case", black);
+      // The first highlight, this is intended to be overwritten
+      ChatFormatter.addHighlighting("a test", black);
+      // The second highlight, this is also intended to be overwritten
+      ChatFormatter.addHighlighting("test", black);
+      ChatFormatter.addHighlighting("a test with a long message", black);
+      // This should remove the second highlight and replace it
+      ChatFormatter.addHighlighting("a test", black);
+      // This should remove the first highlight and replace it with white
+      ChatFormatter.addHighlighting("test", white);
+      ChatFormatter.addHighlighting("the test", black);
+
+      String expected =
+          "test case\n#000000\na test with a long message\n#000000\na test\n#000000\ntest\n#ffffff\nthe test\n#000000";
+
+      assertEquals(expected, Preferences.getString("highlightList"));
+    }
+
+    @Test
+    public void addHighlightWithoutColor() {
+      List<String> testString = List.of("test random", "test color", "test random color");
+
+      Pattern pattern = Pattern.compile("""
+      test random
+      #[a-z0-9]{6}
+      test color
+      #[a-z0-9]{6}
+      test random color
+      #[a-z0-9]{6}""");
+
+      for (String s : testString) {
+        ChatFormatter.addHighlighting(s);
+      }
+
+      String highlightList = Preferences.getString("highlightList");
+      assertTrue(pattern.matcher(highlightList).find());
+    }
   }
 
   @Test

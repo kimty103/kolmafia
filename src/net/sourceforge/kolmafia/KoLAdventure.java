@@ -614,6 +614,11 @@ public class KoLAdventure implements Comparable<KoLAdventure>, Runnable {
         return checkZone("telegraphOfficeAvailable", "_telegraphOfficeToday", "town_right");
       case "Neverending Party":
         // Unlimited adventuring if available
+        if (KoLCharacter.inLegacyOfLoathing()) {
+          if (Preferences.getBoolean("replicaNeverendingPartyAlways")) {
+            return true;
+          }
+        }
         return checkZone("neverendingPartyAlways", "_neverendingPartyToday", "town_wrong");
       case "FantasyRealm":
         // One daily visit if available
@@ -876,6 +881,12 @@ public class KoLAdventure implements Comparable<KoLAdventure>, Runnable {
     */
 
     if (this.zone.equals("Shadow Rift")) {
+      if (!InventoryManager.hasItem(ItemPool.CLOSED_CIRCUIT_PAY_PHONE)
+          && !KoLCharacter.inShadowsOverLoathing()) {
+        // need payphone in inventory or to be in ASoL
+        return false;
+      }
+
       // These are "place.php" visits.
       ShadowRift rift = ShadowRift.findAdventureName(this.adventureName);
       String ingress = Preferences.getString("shadowRiftIngress");
@@ -1955,7 +1966,9 @@ public class KoLAdventure implements Comparable<KoLAdventure>, Runnable {
     if (this.zone.equals("Neverending Party")) {
       // The Neverending Party
       return Preferences.getBoolean("neverendingPartyAlways")
-          || Preferences.getBoolean("_neverendingPartyToday");
+          || Preferences.getBoolean("_neverendingPartyToday")
+          || KoLCharacter.inLegacyOfLoathing()
+              && Preferences.getBoolean("replicaNeverendingPartyAlways");
     }
 
     if (this.zone.equals("Video Game Dungeon")) {

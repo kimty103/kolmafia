@@ -2,17 +2,11 @@ package net.sourceforge.kolmafia;
 
 import static internal.helpers.Networking.html;
 import static internal.helpers.Networking.json;
-import static internal.helpers.Player.withClass;
-import static internal.helpers.Player.withEffect;
-import static internal.helpers.Player.withEquipped;
-import static internal.helpers.Player.withNotAllowedInStandard;
-import static internal.helpers.Player.withPath;
-import static internal.helpers.Player.withProperty;
-import static internal.helpers.Player.withRestricted;
-import static internal.helpers.Player.withSkill;
-import static internal.helpers.Player.withStats;
+import static internal.helpers.Player.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -219,6 +213,26 @@ public class FamiliarDataTest {
     }
   }
 
+  @Test
+  public void findGoodItemTest() {
+    var familiar = FamiliarData.registerFamiliar(FamiliarPool.MOSQUITO, 0);
+    AdventureResult item = ItemPool.get(ItemPool.LEAD_NECKLACE, 1);
+    familiar.setItem(item);
+    KoLCharacter.addFamiliar(familiar);
+
+    AdventureResult result = familiar.findGoodItem(true);
+    assertEquals(familiar.LEAD_NECKLACE, result);
+  }
+
+  @Test
+  public void isCombatFamiliarWhenEquipWhipTest() {
+    var familiar = FamiliarData.registerFamiliar(FamiliarPool.DANDY_LION, 0);
+    AdventureResult item = ItemPool.get(ItemPool.PIXEL_WHIP, 1);
+    EquipmentManager.setEquipment(Slot.WEAPON, item);
+    familiar.setItem(item);
+    assertTrue(familiar.isCombatFamiliar());
+  }
+
   @Nested
   class Terrarium {
     @BeforeAll
@@ -249,6 +263,24 @@ public class FamiliarDataTest {
 
         assertTrue(KoLCharacter.ownedFamiliar(FamiliarPool.PET_ROCK).isPresent());
         assertThat(KoLCharacter.usableFamiliar(FamiliarPool.PET_ROCK), nullValue());
+      }
+    }
+
+    @Test
+    public void registersFamiliarsInLegacyOfLoathing() {
+      var cleanups =
+          new Cleanups(
+              withPath(Path.LEGACY_OF_LOATHING),
+              withRestricted(true),
+              withNotAllowedInStandard(RestrictedItemType.ITEMS, "pygmy bugbear shaman"));
+
+      try (cleanups) {
+        FamiliarData.registerFamiliarData(html("request/test_terrarium_legacy_of_loathing.html"));
+
+        assertTrue(KoLCharacter.ownedFamiliar(FamiliarPool.CRIMBO_ELF).isPresent());
+        assertTrue(KoLCharacter.ownedFamiliar(FamiliarPool.PYGMY_BUGBEAR_SHAMAN).isPresent());
+        assertThat(KoLCharacter.usableFamiliar(FamiliarPool.CRIMBO_ELF), notNullValue());
+        assertThat(KoLCharacter.usableFamiliar(FamiliarPool.PYGMY_BUGBEAR_SHAMAN), notNullValue());
       }
     }
   }
@@ -401,6 +433,87 @@ public class FamiliarDataTest {
         assertEquals(EquipmentRequest.UNEQUIP, current.getItem());
         // Modified Weight
         assertEquals(famLevel, current.getModifiedWeight());
+      }
+    }
+  }
+
+  @Nested
+  class Comma {
+    @Test
+    public void correctEffectiveIdWhenCommaImitating() {
+      var cleanups =
+          new Cleanups(
+              withProperty("commaFamiliar", "Mosquito"), withFamiliar(FamiliarPool.CHAMELEON));
+
+      try (cleanups) {
+        assertThat(KoLCharacter.currentFamiliar.getEffectiveId(), is(FamiliarPool.MOSQUITO));
+      }
+    }
+
+    @Test
+    public void correctEffectiveRaceWhenCommaImitating() {
+      var cleanups =
+          new Cleanups(
+              withProperty("commaFamiliar", "Mosquito"), withFamiliar(FamiliarPool.CHAMELEON));
+
+      try (cleanups) {
+        assertThat(KoLCharacter.currentFamiliar.getEffectiveRace(), is("Mosquito"));
+      }
+    }
+
+    @Test
+    public void correctEffectiveIdWhenCommaEmpty() {
+      var cleanups =
+          new Cleanups(withProperty("commaFamiliar", ""), withFamiliar(FamiliarPool.CHAMELEON));
+
+      try (cleanups) {
+        assertThat(KoLCharacter.currentFamiliar.getEffectiveId(), is(FamiliarPool.CHAMELEON));
+      }
+    }
+
+    @Test
+    public void correctEffectiveRaceWhenCommaEmpty() {
+      var cleanups =
+          new Cleanups(withProperty("commaFamiliar", ""), withFamiliar(FamiliarPool.CHAMELEON));
+
+      try (cleanups) {
+        assertThat(KoLCharacter.currentFamiliar.getEffectiveRace(), is("Comma Chameleon"));
+      }
+    }
+
+    @Test
+    public void commaHasCorrectWeightWhenHomemadeRobot() {
+      var cleanups =
+          new Cleanups(
+              withProperty("commaFamiliar", "Homemade Robot"),
+              withProperty("homemadeRobotUpgrades", 3),
+              withFamiliar(FamiliarPool.CHAMELEON));
+
+      try (cleanups) {
+        assertThat(KoLCharacter.currentFamiliar.getWeight(), is(34));
+      }
+    }
+
+    @Test
+    public void commaDoesNotInheritAttributes() {
+      var cleanups =
+          new Cleanups(
+              withProperty("commaFamiliar", "Hovering Sombrero"),
+              withFamiliar(FamiliarPool.CHAMELEON));
+
+      try (cleanups) {
+        assertThat(KoLCharacter.currentFamiliar.isUndead(), is(false));
+      }
+    }
+
+    @Test
+    public void commaDoesInheritWaterBreathing() {
+      var cleanups =
+          new Cleanups(
+              withProperty("commaFamiliar", "Urchin Urchin"), withFamiliar(FamiliarPool.CHAMELEON));
+
+      try (cleanups) {
+        assertThat(KoLCharacter.currentFamiliar.waterBreathing(), is(true));
       }
     }
   }

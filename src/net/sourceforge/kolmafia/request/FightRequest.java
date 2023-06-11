@@ -2745,7 +2745,8 @@ public class FightRequest extends GenericRequest {
       JuneCleaverManager.updatePreferences(responseText);
     }
 
-    if (KoLCharacter.hasEquipped(ItemPool.DESIGNER_SWEATPANTS)) {
+    if (KoLCharacter.hasEquipped(ItemPool.DESIGNER_SWEATPANTS)
+        || KoLCharacter.hasEquipped(ItemPool.REPLICA_DESIGNER_SWEATPANTS)) {
       Matcher lessSweatMatcher = FightRequest.DESIGNER_SWEATPANTS_LESS_SWEATY.matcher(responseText);
       if (lessSweatMatcher.find()) {
         Preferences.decrement("sweat", StringUtilities.parseInt(lessSweatMatcher.group(1)));
@@ -7112,16 +7113,24 @@ public class FightRequest extends GenericRequest {
       if (have > 0) {
         int count = meat / (5 * have);
         Preferences.setInteger("glitchItemImplementationCount", count);
-        int level =
-            (count >= 111)
-                ? 7
-                : (count >= 69)
-                    ? 6
-                    : (count >= 37)
-                        ? 5
-                        : (count >= 11)
-                            ? 4
-                            : (count >= 4) ? 3 : (count >= 2) ? 2 : (count >= 1) ? 1 : 0;
+        int level;
+        if (count >= 111) {
+          level = 7;
+        } else if (count >= 69) {
+          level = 6;
+        } else if (count >= 37) {
+          level = 5;
+        } else if (count >= 11) {
+          level = 4;
+        } else if (count >= 4) {
+          level = 3;
+        } else if (count >= 2) {
+          level = 2;
+        } else if (count >= 1) {
+          level = 1;
+        } else {
+          level = 0;
+        }
         Preferences.setInteger("glitchItemImplementationLevel", level);
       }
     }
@@ -7211,6 +7220,37 @@ public class FightRequest extends GenericRequest {
 
   public static final Pattern CHAKRA_PATTERN = Pattern.compile("This Chakra is now (\\d+)% clean.");
 
+  public enum ChakraLocation {
+    BUNG_CHAKRA("Your Bung Chakra", "crimbo16BungChakraCleanliness"),
+    GUTS_CHAKRA("Your Guts Chakra", "crimbo16GutsChakraCleanliness"),
+    LIVER_CHAKRA("Your Liver Chakra", "crimbo16LiverChakraCleanliness"),
+    NIPPLE_CHAKRA("Your Nipple Chakra", "crimbo16NippleChakraCleanliness"),
+    NOSE_CHAKRA("Your Nose Chakra", "crimbo16NoseChakraCleanliness"),
+    HAT_CHAKRA("Your Hat Chakra", "crimbo16HatChakraCleanliness"),
+    SACK("Crimbo's Sack", "crimbo16SackChakraCleanliness"),
+    BOOTS("Crimbo's Boots", "crimbo16BootsChakraCleanliness"),
+    JELLY("Crimbo's Jelly", "crimbo16JellyChakraCleanliness"),
+    REINDEER("Crimbo's Reindeer", "crimbo16ReindeerChakraCleanliness"),
+    BEARD("Crimbo's Beard", "crimbo16BeardChakraCleanliness"),
+    HAT("Crimbo's Hat", "crimbo16CrimboHatChakraCleanliness");
+
+    private final String location;
+    private final String setting;
+
+    ChakraLocation(String location, String setting) {
+      this.location = location;
+      this.setting = setting;
+    }
+
+    public String getLocation() {
+      return location;
+    }
+
+    public String getSetting() {
+      return setting;
+    }
+  }
+
   private static boolean handleChakra(TagNode node, TagStatus status) {
     String str = node.getText().toString();
 
@@ -7221,32 +7261,13 @@ public class FightRequest extends GenericRequest {
 
     int cleanliness = StringUtilities.parseInt(matcher.group(1));
 
-    String setting =
-        status.location.equals("Your Bung Chakra")
-            ? "crimbo16BungChakraCleanliness"
-            : status.location.equals("Your Guts Chakra")
-                ? "crimbo16GutsChakraCleanliness"
-                : status.location.equals("Your Liver Chakra")
-                    ? "crimbo16LiverChakraCleanliness"
-                    : status.location.equals("Your Nipple Chakra")
-                        ? "crimbo16NippleChakraCleanliness"
-                        : status.location.equals("Your Nose Chakra")
-                            ? "crimbo16NoseChakraCleanliness"
-                            : status.location.equals("Your Hat Chakra")
-                                ? "crimbo16HatChakraCleanliness"
-                                : status.location.equals("Crimbo's Sack")
-                                    ? "crimbo16SackChakraCleanliness"
-                                    : status.location.equals("Crimbo's Boots")
-                                        ? "crimbo16BootsChakraCleanliness"
-                                        : status.location.equals("Crimbo's Jelly")
-                                            ? "crimbo16JellyChakraCleanliness"
-                                            : status.location.equals("Crimbo's Reindeer")
-                                                ? "crimbo16ReindeerChakraCleanliness"
-                                                : status.location.equals("Crimbo's Beard")
-                                                    ? "crimbo16BeardChakraCleanliness"
-                                                    : status.location.equals("Crimbo's Hat")
-                                                        ? "crimbo16CrimboHatChakraCleanliness"
-                                                        : null;
+    String setting = null;
+    for (ChakraLocation chakraLocation : ChakraLocation.values()) {
+      if (status.location.equals(chakraLocation.getLocation())) {
+        setting = chakraLocation.getSetting();
+        break;
+      }
+    }
 
     if (setting != null) {
       Preferences.setString(setting, matcher.group(1));
@@ -10166,6 +10187,7 @@ public class FightRequest extends GenericRequest {
 
       case SkillPool.LAUNCH_SPIKOLODON_SPIKES:
         if (responseText.contains("The spikolodon spikes both")) {
+          Preferences.setBoolean("noncombatForcerActive", true);
           skillSuccess = true;
         }
         break;
@@ -10642,8 +10664,11 @@ public class FightRequest extends GenericRequest {
           > Preferences.getInteger("_banderRunaways")) {
         return 100;
       }
-    } else if (KoLCharacter.hasEquipped(ItemPool.get(ItemPool.NAVEL_RING, 1))
-        || KoLCharacter.hasEquipped(ItemPool.get(ItemPool.GREAT_PANTS, 1))) {
+    } else if (KoLCharacter.hasEquipped(ItemPool.NAVEL_RING)
+        || KoLCharacter.hasEquipped(ItemPool.GREAT_PANTS)
+        || (KoLCharacter.inLegacyOfLoathing()
+            && (KoLCharacter.hasEquipped(ItemPool.REPLICA_NAVEL_RING)
+                || KoLCharacter.hasEquipped(ItemPool.REPLICA_GREAT_PANTS)))) {
       int navelRunaways = Preferences.getInteger("_navelRunaways");
 
       return navelRunaways < 3 ? 100 : navelRunaways < 6 ? 80 : navelRunaways < 9 ? 50 : 20;

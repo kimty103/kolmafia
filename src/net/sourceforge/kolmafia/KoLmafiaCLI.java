@@ -549,12 +549,13 @@ public class KoLmafiaCLI {
         .register("call")
         .register("run")
         .register("exec")
-        .register("exececute")
+        .register("execute")
         .register("load")
         .register("start")
         .register("profile");
     new CampgroundCommand().register("camp").register("campground");
     new ChangeCombatScriptCommand().register("ccs");
+    new ChibiBuddyCommand().register("chibi");
     new CargoCultCommand().register("cargo");
     new CheckDataCommand()
         .register("newdata")
