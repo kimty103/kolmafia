@@ -96,4 +96,27 @@ public class DadManagerTest {
     }
   }
 
+  @Test
+  public void canSetWeakness10BeNone() {
+    int targetIndex = 10;
+    String[] clueTextList = {
+      "",
+      "chaotic",
+      "shamble",
+      "putrescent",
+      "darkness",
+      "wobbles",
+      "suddenly",
+      "64",
+      "mind",
+      "3",
+      "head"
+    };
+    String responseText = setResponseText(clueTextList);
+
+    DadManager.solve(responseText);
+
+    Element noneWeakness = DadManager.weakness(targetIndex);
+    assertEquals(Element.NONE, noneWeakness);
+  }
 }
