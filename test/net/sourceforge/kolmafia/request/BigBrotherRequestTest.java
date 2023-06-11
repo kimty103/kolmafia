@@ -7,23 +7,26 @@ import static internal.helpers.Player.withProperty;
 import static internal.helpers.Player.withQuestProgress;
 import static internal.matchers.Preference.isSetTo;
 import static internal.matchers.Quest.isStep;
+import static net.sourceforge.kolmafia.request.BigBrotherRequest.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 import internal.helpers.Cleanups;
 import internal.network.FakeHttpClientBuilder;
-import net.sourceforge.kolmafia.AscensionClass;
-import net.sourceforge.kolmafia.KoLCharacter;
+import java.util.List;
+import net.sourceforge.kolmafia.*;
 import net.sourceforge.kolmafia.KoLConstants.Stat;
+import net.sourceforge.kolmafia.objectpool.FamiliarPool;
+import net.sourceforge.kolmafia.objectpool.ItemPool;
 import net.sourceforge.kolmafia.persistence.QuestDatabase;
 import net.sourceforge.kolmafia.persistence.QuestDatabase.Quest;
 import net.sourceforge.kolmafia.preferences.Preferences;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BigBrotherRequestTest {
 
   @BeforeAll
@@ -34,6 +37,99 @@ public class BigBrotherRequestTest {
   @BeforeEach
   public void beforeEach() {
     Preferences.reset("Big Brother");
+
+    KoLConstants.inventory.clear();
+  }
+
+  @Test
+  @Order(1)
+  void accessibleTest() {
+    KoLConstants.inventory.clear();
+
+    assertThat(BigBrotherRequest.accessible(), is("You haven't rescued Big Brother yet."));
+
+    KoLConstants.inventory.add(BUBBLIN_STONE);
+
+    assertThat(
+        BigBrotherRequest.accessible(),
+        is("You don't have the right equipment to adventure underwater."));
+
+    KoLConstants.inventory.add(AERATED_DIVING_HELMET);
+
+    assertThat(
+        BigBrotherRequest.accessible(),
+        is("Your familiar doesn't have the right equipment to adventure underwater."));
+
+    KoLConstants.inventory.add(DAS_BOOT);
+
+    assertThat(BigBrotherRequest.accessible(), is(nullValue()));
+  }
+
+  @Test
+  @Order(2)
+  void canBuyItemTest() {
+    CoinmasterData dataForTrueTest = BigBrotherRequest.BIG_BROTHER;
+
+    List<Integer> items =
+        List.of(ItemPool.MADNESS_REEF_MAP, ItemPool.DAMP_OLD_BOOT, ItemPool.BLACK_GLASS);
+
+    for (Integer item : items) {
+      assertThat(dataForTrueTest.canBuyItem(item), is(true));
+    }
+
+    KoLConstants.inventory.add(BLACK_GLASS);
+    Preferences.setBoolean("mapToMadnessReefPurchased", true);
+    Preferences.setBoolean("dampOldBootPurchased", true);
+
+    CoinmasterData dataForFalseTest = BigBrotherRequest.BIG_BROTHER;
+
+    for (Integer item : items) {
+      assertThat(dataForFalseTest.canBuyItem(item), is(false));
+    }
+
+    assertThat(dataForFalseTest.canBuyItem(ItemPool.FOLDER_19), is(false));
+    assertThat(dataForFalseTest.canBuyItem(ItemPool.HOUSE), is(false));
+
+    Preferences.setBoolean("mapToMadnessReefPurchased", false);
+    Preferences.setBoolean("dampOldBootPurchased", false);
+  }
+
+  @Test
+  @Order(3)
+  void equipTest() {
+    BigBrotherRequest bigBrotherRequest = new BigBrotherRequest();
+
+    List<AdventureResult> selfResults =
+        List.of(
+            AERATED_DIVING_HELMET,
+            SCHOLAR_MASK,
+            GLADIATOR_MASK,
+            CRAPPY_MASK,
+            SCUBA_GEAR,
+            OLD_SCUBA_TANK);
+    List<AdventureResult> familiarResults = List.of(AMPHIBIOUS_TOPHAT, DAS_BOOT, BATHYSPHERE);
+
+    KoLCharacter.setFamiliar(new FamiliarData(FamiliarPool.DANCING_FROG));
+
+    KoLConstants.inventory.add(DAS_BOOT);
+
+    for (AdventureResult result : selfResults) {
+      KoLConstants.inventory.add(result);
+
+      bigBrotherRequest.equip();
+
+      KoLConstants.inventory.remove(result);
+    }
+
+    KoLConstants.inventory.add(AERATED_DIVING_HELMET);
+
+    for (AdventureResult result : familiarResults) {
+      KoLConstants.inventory.add(result);
+
+      bigBrotherRequest.equip();
+
+      KoLConstants.inventory.remove(result);
+    }
   }
 
   @Nested
