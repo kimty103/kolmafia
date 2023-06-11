@@ -756,40 +756,25 @@ public class AreaCombatData {
       }
     }
 
-    var encounter = EncounterManager.findEncounterForLocation(this.zone, EncounterType.LUCKY);
-
-    if (encounter != null) {
-      buffer.append("<br>");
-      buffer.append("<b>Lucky:</b> ");
-      buffer.append(encounter);
-    }
-
-    encounter = EncounterManager.findEncounterForLocation(this.zone, EncounterType.GLYPH);
-
-    if (encounter != null) {
-      buffer.append("<br>");
-      buffer.append("<b>Hobo Glyph:</b> ");
-      buffer.append(encounter);
-    }
+    addEncounterHTML(buffer, "Lucky:", EncounterType.LUCKY);
+    addEncounterHTML(buffer, "Hobo Glyph:", EncounterType.GLYPH);
 
     if (KoLCharacter.inAxecore()) {
-      encounter = EncounterManager.findEncounterForLocation(this.zone, EncounterType.BORIS);
-
-      if (encounter != null) {
-        buffer.append("<br>");
-        buffer.append("<b>Clancy:</b> ");
-        buffer.append(encounter);
-      }
+      addEncounterHTML(buffer, "Clancy:", EncounterType.BORIS);
     }
 
     if (KoLCharacter.inBadMoon()) {
-      encounter = EncounterManager.findEncounterForLocation(this.zone, EncounterType.BADMOON);
+      addEncounterHTML(buffer, "Badmoon:", EncounterType.BADMOON);
+    }
+  }
 
-      if (encounter != null) {
-        buffer.append("<br>");
-        buffer.append("<b>Badmoon:</b> ");
-        buffer.append(encounter);
-      }
+  private void addEncounterHTML(StringBuffer buffer, String name, EncounterType encounterType) {
+    var encounter = EncounterManager.findEncounterForLocation(this.zone, encounterType);
+
+    if (encounter != null) {
+      buffer.append("<br>");
+      buffer.append("<b>").append(name).append("</b> ");
+      buffer.append(encounter);
     }
   }
 

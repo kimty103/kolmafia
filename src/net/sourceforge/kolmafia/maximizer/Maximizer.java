@@ -738,7 +738,8 @@ public class Maximizer {
           duration = 30;
         } else if (cmd.startsWith("cargo effect ")) {
           // Must be available in your current path
-          if (!StandardRequest.isAllowed(RestrictedItemType.ITEMS, "Cargo Cultist Shorts")) {
+          if (!KoLCharacter.inLegacyOfLoathing()
+              && !StandardRequest.isAllowed(RestrictedItemType.ITEMS, "Cargo Cultist Shorts")) {
             continue;
           }
           // You must have the cargo shorts
@@ -1018,7 +1019,9 @@ public class Maximizer {
           usesRemaining = Preferences.getBoolean(buffPref) ? 0 : 1;
         } else if (cmd.startsWith("gap ")) {
           AdventureResult pants = EquipmentManager.getEquipment(Slot.PANTS);
-          if (InventoryManager.getAccessibleCount(ItemPool.GREAT_PANTS) == 0) {
+          if (InventoryManager.getAccessibleCount(ItemPool.GREAT_PANTS) == 0
+              && (!KoLCharacter.inLegacyOfLoathing()
+                  || InventoryManager.getAccessibleCount(ItemPool.REPLICA_GREAT_PANTS) == 0)) {
             if (includeAll) {
               text = "(acquire and equip Greatest American Pants for " + name + ")";
               cmd = "";
@@ -1105,7 +1108,10 @@ public class Maximizer {
           duration = 100;
           usesRemaining = Preferences.getBoolean("_daycareSpa") ? 0 : 1;
         } else if (cmd.startsWith("play")) {
-          if (InventoryManager.getAccessibleCount(ItemPool.DECK_OF_EVERY_CARD) == 0) {
+          if (InventoryManager.getAccessibleCount(ItemPool.DECK_OF_EVERY_CARD) == 0
+              && (!KoLCharacter.inLegacyOfLoathing()
+                  || InventoryManager.getAccessibleCount(ItemPool.REPLICA_DECK_OF_EVERY_CARD)
+                      == 0)) {
             if (includeAll) {
               text = "(acquire Deck of Every Card for " + name + ")";
               cmd = "";
@@ -1134,7 +1140,9 @@ public class Maximizer {
           duration = 30;
           usesRemaining = Preferences.getBoolean("_grimBuff") ? 0 : 1;
         } else if (cmd.equals("witchess")) {
-          if (!StandardRequest.isAllowed(RestrictedItemType.ITEMS, "Witchess Set")) {
+          if (!(KoLCharacter.inLegacyOfLoathing()
+                  && Preferences.getBoolean("replicaWitchessSetAvailable"))
+              && !StandardRequest.isAllowed(RestrictedItemType.ITEMS, "Witchess Set")) {
             continue;
           }
           if (!KoLConstants.campground.contains(ItemPool.get(ItemPool.WITCHESS_SET, 1))) {

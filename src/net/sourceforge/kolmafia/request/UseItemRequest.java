@@ -925,7 +925,7 @@ public class UseItemRequest extends GenericRequest {
     }
 
     switch (itemId) {
-      case ItemPool.DECK_OF_EVERY_CARD -> {
+      case ItemPool.DECK_OF_EVERY_CARD, ItemPool.REPLICA_DECK_OF_EVERY_CARD -> {
         // Treat a "use" of the deck as "play random"
         (new DeckOfEveryCardRequest()).run();
         return;
@@ -2888,6 +2888,10 @@ public class UseItemRequest extends GenericRequest {
           return;
         }
 
+        break;
+
+      case ItemPool.REPLICA_CHATEAU_ROOM_KEY:
+        Preferences.setBoolean("replicaChateauAvailable", true);
         break;
 
       case ItemPool.GINGERBREAD_CITY:
@@ -4867,6 +4871,11 @@ public class UseItemRequest extends GenericRequest {
         Preferences.increment("darkGyfftePoints");
         break;
 
+      case ItemPool.REPLICA_TEN_DOLLARS:
+        // Get success text
+        Preferences.increment("legacyPoints", 1, 19, false);
+        break;
+
       case ItemPool.ESSENCE_OF_ANNOYANCE:
         if (!responseText.contains("You quaff")) {
           return;
@@ -5143,6 +5152,11 @@ public class UseItemRequest extends GenericRequest {
         return;
 
       case ItemPool.CLARA_BELL:
+        // To make tests easier, this is the longest contiguous block without commas
+        if (responseText.contains(
+            "your stomach drops and your ears pop as you are suddenly plunged into a horrifyingly dark and blurry version of the world you once knew")) {
+          Preferences.setBoolean("noncombatForcerActive", true);
+        }
         Preferences.setBoolean("_claraBellUsed", true);
         return;
 
@@ -5492,6 +5506,10 @@ public class UseItemRequest extends GenericRequest {
 
       case ItemPool.NEVERENDING_PARTY_INVITE:
         Preferences.setBoolean("neverendingPartyAlways", true);
+        break;
+
+      case ItemPool.REPLICA_NEVERENDING_PARTY_INVITE:
+        Preferences.setBoolean("replicaNeverendingPartyAlways", true);
         break;
 
       case ItemPool.NEVERENDING_PARTY_INVITE_DAILY:
@@ -6021,6 +6039,31 @@ public class UseItemRequest extends GenericRequest {
         // You already wrote a course on the certificate with totally indelible-for-a-day marker.
         Preferences.setBoolean("_sitCourseCompleted", true);
         return;
+
+      case ItemPool.REPLICA_SNOWCONE_BOOK:
+        if (responseText.contains("You open the Tome")
+            || responseText.contains("already read this book")) {
+          Preferences.setBoolean("_replicaSnowconeTomeUsed", true);
+        }
+        return;
+
+      case ItemPool.REPLICA_RESOLUTION_BOOK:
+        if (responseText.contains("You make a bunch of resolutions")
+            || responseText.contains("already made enough resolutions")) {
+          Preferences.setBoolean("_replicaResolutionLibramUsed", true);
+        }
+        return;
+
+      case ItemPool.REPLICA_SMITH_BOOK:
+        if (responseText.contains("You read from The Smith")
+            || responseText.contains("smithed enough for today")) {
+          Preferences.setBoolean("_replicaSmithsTomeUsed", true);
+        }
+        return;
+
+      case ItemPool.REPLICA_WITCHESS_SET:
+        Preferences.setBoolean("replicaWitchessSetAvailable", true);
+        break;
     }
 
     if (CampgroundRequest.isWorkshedItem(itemId)) {
@@ -6688,7 +6731,10 @@ public class UseItemRequest extends GenericRequest {
   public int getAdventuresUsed() {
     // Some only use adventures when used as a proxy for a non adventure game location
     return switch (this.itemUsed.getItemId()) {
-      case ItemPool.CHATEAU_WATERCOLOR, ItemPool.GOD_LOBSTER, ItemPool.WITCHESS_SET -> 0;
+      case ItemPool.CHATEAU_WATERCOLOR,
+          ItemPool.GOD_LOBSTER,
+          ItemPool.WITCHESS_SET,
+          ItemPool.REPLICA_WITCHESS_SET -> 0;
       default -> UseItemRequest.getAdventuresUsedByItem(this.itemUsed);
     };
   }
@@ -6705,6 +6751,7 @@ public class UseItemRequest extends GenericRequest {
     return item == null
         ? 0
         : item.getItemId() == ItemPool.DECK_OF_EVERY_CARD
+                || item.getItemId() == ItemPool.REPLICA_DECK_OF_EVERY_CARD
             ? DeckOfEveryCardRequest.getAdventuresUsed(urlString)
             : UseItemRequest.getAdventuresUsedByItem(item);
   }
@@ -6735,6 +6782,8 @@ public class UseItemRequest extends GenericRequest {
           ItemPool.PHOTOCOPIED_MONSTER,
           ItemPool.POCKET_WISH,
           ItemPool.RAIN_DOH_MONSTER,
+          ItemPool.REPLICA_DECK_OF_EVERY_CARD,
+          ItemPool.REPLICA_GENIE_BOTTLE,
           ItemPool.SCREENCAPPED_MONSTER,
           ItemPool.SHAKING_CAMERA,
           ItemPool.SHAKING_CRAPPY_CAMERA,
