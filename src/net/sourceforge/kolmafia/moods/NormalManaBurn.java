@@ -5,6 +5,14 @@ import net.sourceforge.kolmafia.KoLmafiaCLI;
 
 public class NormalManaBurn extends ManaBurnStatement {
 
+  private static final NormalManaBurn INSTANCE = new NormalManaBurn();
+
+  private NormalManaBurn() {}
+
+  public static NormalManaBurn getInstance() {
+    return INSTANCE;
+  }
+
   @Override
   public boolean beforeManaBurn(Object o) {
     return !KoLCharacter.inZombiecore();
