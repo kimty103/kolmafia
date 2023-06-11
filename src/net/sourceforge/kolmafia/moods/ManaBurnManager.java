@@ -21,11 +21,7 @@ public class ManaBurnManager {
   private ManaBurnManager() {}
 
   public static final void burnExtraMana(final boolean isManualInvocation) {
-<<<<<<< Updated upstream
-      new ExtraManaBurn().run(isManualInvocation);
-=======
     ExtraManaBurn.getInstance().run(isManualInvocation);
->>>>>>> Stashed changes
   }
 
   public static final void burnMana(final long minimum) {
