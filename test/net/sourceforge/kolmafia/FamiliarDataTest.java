@@ -2,16 +2,7 @@ package net.sourceforge.kolmafia;
 
 import static internal.helpers.Networking.html;
 import static internal.helpers.Networking.json;
-import static internal.helpers.Player.withClass;
-import static internal.helpers.Player.withEffect;
-import static internal.helpers.Player.withEquipped;
-import static internal.helpers.Player.withFamiliar;
-import static internal.helpers.Player.withNotAllowedInStandard;
-import static internal.helpers.Player.withPath;
-import static internal.helpers.Player.withProperty;
-import static internal.helpers.Player.withRestricted;
-import static internal.helpers.Player.withSkill;
-import static internal.helpers.Player.withStats;
+import static internal.helpers.Player.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -220,6 +211,26 @@ public class FamiliarDataTest {
       fam.setExperience(69);
       assertThat(fam.getWeight(), equalTo(weight));
     }
+  }
+
+  @Test
+  public void findGoodItemTest() {
+    var familiar = FamiliarData.registerFamiliar(FamiliarPool.MOSQUITO, 0);
+    AdventureResult item = ItemPool.get(ItemPool.LEAD_NECKLACE, 1);
+    familiar.setItem(item);
+    KoLCharacter.addFamiliar(familiar);
+
+    AdventureResult result = familiar.findGoodItem(true);
+    assertEquals(familiar.LEAD_NECKLACE, result);
+  }
+
+  @Test
+  public void isCombatFamiliarWhenEquipWhipTest() {
+    var familiar = FamiliarData.registerFamiliar(FamiliarPool.DANDY_LION, 0);
+    AdventureResult item = ItemPool.get(ItemPool.PIXEL_WHIP, 1);
+    EquipmentManager.setEquipment(Slot.WEAPON, item);
+    familiar.setItem(item);
+    assertTrue(familiar.isCombatFamiliar());
   }
 
   @Nested

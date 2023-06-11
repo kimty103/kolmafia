@@ -8,7 +8,6 @@ import net.sourceforge.kolmafia.AdventureResult;
 import net.sourceforge.kolmafia.KoLCharacter;
 import net.sourceforge.kolmafia.KoLConstants;
 import net.sourceforge.kolmafia.KoLmafia;
-import net.sourceforge.kolmafia.KoLmafiaCLI;
 import net.sourceforge.kolmafia.maximizer.Evaluator;
 import net.sourceforge.kolmafia.persistence.SkillDatabase;
 import net.sourceforge.kolmafia.preferences.Preferences;
@@ -21,7 +20,9 @@ public class ManaBurnManager {
   private ManaBurnManager() {}
 
   public static final void burnExtraMana(final boolean isManualInvocation) {
-    ExtraManaBurn.getInstance().run(isManualInvocation);
+
+  ExtraManaBurn.getInstance().run(isManualInvocation);
+
   }
 
   public static final void burnMana(final long minimum) {

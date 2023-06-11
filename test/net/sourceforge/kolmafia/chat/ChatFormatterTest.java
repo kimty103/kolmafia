@@ -1,11 +1,17 @@
 package net.sourceforge.kolmafia.chat;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Color;
+import java.util.List;
+import java.util.regex.Pattern;
 import net.sourceforge.kolmafia.preferences.Preferences;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 public class ChatFormatterTest {
   @BeforeEach
@@ -14,28 +20,52 @@ public class ChatFormatterTest {
     StyledChatBuffer.initializeHighlights();
   }
 
-  @Test
-  public void addHightlightTest() {
-    Color black = Color.BLACK;
-    Color white = Color.WHITE;
+  @Nested
+  class addHighlightTest {
 
-    // Here we're testing if the messages are added correctly
-    ChatFormatter.addHighlighting("test case", black);
-    // The first highlight, this is intended to be overwritten
-    ChatFormatter.addHighlighting("a test", black);
-    // The second highlight, this is also intended to be overwritten
-    ChatFormatter.addHighlighting("test", black);
-    ChatFormatter.addHighlighting("a test with a long message", black);
-    // This should remove the second highlight and replace it
-    ChatFormatter.addHighlighting("a test", black);
-    // This should remove the first highlight and replace it with white
-    ChatFormatter.addHighlighting("test", white);
-    ChatFormatter.addHighlighting("the test", black);
+    @Test
+    public void addHighlightWithColor() {
+      Color black = Color.BLACK;
+      Color white = Color.WHITE;
 
-    String expected =
-        "test case\n#000000\na test with a long message\n#000000\na test\n#000000\ntest\n#ffffff\nthe test\n#000000";
+      // Here we're testing if the messages are added correctly
+      ChatFormatter.addHighlighting("test case", black);
+      // The first highlight, this is intended to be overwritten
+      ChatFormatter.addHighlighting("a test", black);
+      // The second highlight, this is also intended to be overwritten
+      ChatFormatter.addHighlighting("test", black);
+      ChatFormatter.addHighlighting("a test with a long message", black);
+      // This should remove the second highlight and replace it
+      ChatFormatter.addHighlighting("a test", black);
+      // This should remove the first highlight and replace it with white
+      ChatFormatter.addHighlighting("test", white);
+      ChatFormatter.addHighlighting("the test", black);
 
-    assertEquals(expected, Preferences.getString("highlightList"));
+      String expected =
+          "test case\n#000000\na test with a long message\n#000000\na test\n#000000\ntest\n#ffffff\nthe test\n#000000";
+
+      assertEquals(expected, Preferences.getString("highlightList"));
+    }
+
+    @Test
+    public void addHighlightWithoutColor() {
+      List<String> testString = List.of("test random", "test color", "test random color");
+
+      Pattern pattern = Pattern.compile("""
+      test random
+      #[a-z0-9]{6}
+      test color
+      #[a-z0-9]{6}
+      test random color
+      #[a-z0-9]{6}""");
+
+      for (String s : testString) {
+        ChatFormatter.addHighlighting(s);
+      }
+
+      String highlightList = Preferences.getString("highlightList");
+      assertTrue(pattern.matcher(highlightList).find());
+    }
   }
 
   @Test
