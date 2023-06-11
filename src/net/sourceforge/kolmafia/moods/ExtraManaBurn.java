@@ -7,6 +7,14 @@ import net.sourceforge.kolmafia.preferences.Preferences;
 
 public class ExtraManaBurn extends ManaBurnStatement {
 
+  private static final ExtraManaBurn INSTANCE = new ExtraManaBurn();
+
+  private ExtraManaBurn() {}
+
+  public static ExtraManaBurn getInstance() {
+    return INSTANCE;
+  }
+
   @Override
   public boolean beforeManaBurn(Object isManualInvocation) {
     if (KoLmafia.refusesContinue()
