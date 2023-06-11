@@ -41,6 +41,15 @@ public class BigBrotherRequestTest {
     KoLConstants.inventory.clear();
   }
 
+  /**
+   * Purpose: test accessible adding item to inventory
+   * Input: add item to inventory each call function
+   * Expected:
+   *    return "You haven't rescued Big Brother yet."
+   *    return "You don't have the right equipment to adventure underwater."
+   *    return "Your familiar doesn't have the right equipment to adventure underwater."
+   *    return null
+   */
   @Test
   @Order(1)
   void accessibleTest() {
@@ -65,6 +74,13 @@ public class BigBrotherRequestTest {
     assertThat(BigBrotherRequest.accessible(), is(nullValue()));
   }
 
+  /**
+   * Purpose: test canBuyItem adding item to inventory and change Preferences value
+   * Input: add item to inventory and change Preferences value
+   * Expected:
+   *    return true before change values
+   *    return false
+   */
   @Test
   @Order(2)
   void canBuyItemTest() {
@@ -94,6 +110,11 @@ public class BigBrotherRequestTest {
     Preferences.setBoolean("dampOldBootPurchased", false);
   }
 
+  /**
+   * Purpose: test equip and update with adding or removing item in inventory
+   * Input: list of item adventure request
+   * Expected: BigBrotherRequest`s member variable self and familiar are change each adding or removing item
+   */
   @Test
   @Order(3)
   void equipTest() {

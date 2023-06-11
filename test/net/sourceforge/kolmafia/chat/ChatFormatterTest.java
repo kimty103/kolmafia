@@ -22,13 +22,30 @@ public class ChatFormatterTest {
     StyledChatBuffer.initializeHighlights();
   }
 
-
+  /**
+   * Purpose: test removeLineColorTest with html tag
+   * Input:
+   *    <font color=red>test1</font>
+   *    <font color=green>test2</font>
+   * Expected:
+   *    return test1
+   *    return test2
+   */
   @Test
   void removeLineColorTest() {
     assertEquals("test1", ChatFormatter.removeLineColor("<font color=red>test1</font>"));
     assertEquals("test2", ChatFormatter.removeLineColor("<font color=green>test2</font>"));
   }
 
+  /**
+   * Purpose: test getNormalizedMessageTest using html tag
+   * Input:
+   *    test<!--lastseen:test-->1
+   *    test<table><tr>tr</tr><td>td</td></table>2
+   * Expected:
+   *    return test1
+   *    return test2
+   */
   @Test
   void getNormalizedMessageTest() {
     assertEquals("test1", ChatFormatter.formatInternalMessage("test<!--lastseen:test-->1"));
@@ -36,6 +53,11 @@ public class ChatFormatterTest {
         "test2", ChatFormatter.formatInternalMessage("test<table><tr>tr</tr><td>td</td></table>2"));
   }
 
+  /**
+   * Purpose: test testRemoveColor using html tag
+   * Input: test<font color=red>Remove</font>Color
+   * Expected: return testRemoveColor
+   */
   @Test
   void removeMessageColorsTest() {
     assertEquals(
@@ -43,6 +65,11 @@ public class ChatFormatterTest {
         ChatFormatter.removeMessageColors("test<font color=red>Remove</font>Color"));
   }
 
+  /**
+   * Purpose: test formatChatMessage using instance of ChatMessage, SystemMessage, ModeratorMessage, EventMessage
+   * Input: instance of ChatMessage, SystemMessage, ModeratorMessage, EventMessage
+   * Expected: each return value match regex pattern
+   */
   @Test
   void formatChatMessageTest() {
     String sender = "testSender";
