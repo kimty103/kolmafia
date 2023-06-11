@@ -1,5 +1,6 @@
 package net.sourceforge.kolmafia.utilities;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -30,6 +31,23 @@ public class ChoiceUtilities {
     Pattern.compile("value=['\"]?(\\d+)['\"]? name=['\"]?whichchoice['\"]?"),
     Pattern.compile("whichchoice=(\\d+)"),
   };
+
+
+
+  public static final String CHOICE_PHP = "choice.php";
+  public static final String SECRET_CHOICE = "(secret choice)";
+
+  public static final Map<String, Integer> responseTextMap =
+      new HashMap<>() {
+        {
+          put("<b>Hippy Talkin'</b>", 798);
+          put("<b>Another Errand I Mean Quest</b>", 930);
+          put("<b>The WLF Bunker</b>", 1093);
+          put("<b>Lyle, LyleCo CEO</b>", 1309);
+          put("<b>What the Future Holds</b>", 1462);
+          put("<b>Make a Wish</b>", 1501);
+        }
+      };
 
   private ChoiceUtilities() {}
 
@@ -62,21 +80,11 @@ public class ChoiceUtilities {
     }
 
     // Rarely, a choice isn't given, but try to identify it anyway:
-    if (responseText.contains("<b>Hippy Talkin'</b>")) {
-      // Is this really missing? My logs look normal
-      return 798;
-    } else if (responseText.contains("<b>Another Errand I Mean Quest</b>")) {
-      return 930;
-    } else if (responseText.contains("<b>The WLF Bunker</b>")) {
-      return 1093;
-    } else if (responseText.contains("<b>Lyle, LyleCo CEO</b>")) {
-      return 1309;
-    } else if (responseText.contains("<b>What the Future Holds</b>")) {
-      return 1462;
-    } else if (responseText.contains("<b>Make a Wish</b>")) {
-      return 1501;
+    for (Map.Entry<String, Integer> entry : responseTextMap.entrySet()) {
+      if (responseText.contains(entry.getKey())) {
+        return entry.getValue();
+      }
     }
-
     return 0;
   }
 
@@ -117,39 +125,22 @@ public class ChoiceUtilities {
     }
 
     Matcher m = FORM_PATTERN.matcher(responseText);
-    while (m.find()) {
-      String form = m.group();
-      if (!form.contains("choice.php")) {
-        continue;
-      }
-      Matcher optMatcher = OPTION_PATTERN1.matcher(form);
-      if (!optMatcher.find()) {
-        continue;
-      }
-      int decision = Integer.parseInt(optMatcher.group(1));
-      Integer key = decision;
-      if (rv.get(key) != null) {
-        continue;
-      }
-      Matcher textMatcher = TEXT_PATTERN1.matcher(form);
-      String text =
-          !textMatcher.find()
-              ? "(secret choice)"
-              : textMatcher.group(1) != null
-                  ? textMatcher.group(1)
-                  : textMatcher.group(2) != null
-                      ? textMatcher.group(2)
-                      : textMatcher.group(3) != null ? textMatcher.group(3) : "(secret choice)";
-      rv.put(key, text);
-    }
+    addToMap(rv, m, OPTION_PATTERN1, TEXT_PATTERN1);
 
     m = LINK_PATTERN.matcher(responseText);
+    addToMap(rv, m, OPTION_PATTERN2, TEXT_PATTERN2);
+
+    return rv;
+  }
+
+  private static void addToMap(
+      Map<Integer, String> rv, Matcher m, Pattern optionPattern, Pattern textPattern) {
     while (m.find()) {
       String form = m.group();
-      if (!form.contains("choice.php")) {
+      if (!form.contains(CHOICE_PHP)) {
         continue;
       }
-      Matcher optMatcher = OPTION_PATTERN2.matcher(form);
+      Matcher optMatcher = optionPattern.matcher(form);
       if (!optMatcher.find()) {
         continue;
       }
@@ -158,19 +149,17 @@ public class ChoiceUtilities {
       if (rv.get(key) != null) {
         continue;
       }
-      Matcher textMatcher = TEXT_PATTERN2.matcher(form);
+      Matcher textMatcher = textPattern.matcher(form);
       String text =
           !textMatcher.find()
-              ? "(secret choice)"
+              ? SECRET_CHOICE
               : textMatcher.group(1) != null
                   ? textMatcher.group(1)
                   : textMatcher.group(2) != null
                       ? textMatcher.group(2)
-                      : textMatcher.group(3) != null ? textMatcher.group(3) : "(secret choice)";
+                      : textMatcher.group(3) != null ? textMatcher.group(3) : SECRET_CHOICE;
       rv.put(key, text);
     }
-
-    return rv;
   }
 
   public static Map<Integer, String> parseChoicesWithSpoilers(final String responseText) {
@@ -243,7 +232,7 @@ public class ChoiceUtilities {
     Matcher m = FORM_PATTERN.matcher(responseText);
     while (m.find()) {
       String form = m.group();
-      if (!form.contains("choice.php")) {
+      if (!form.contains(CHOICE_PHP)) {
         continue;
       }
       Matcher optMatcher = OPTION_PATTERN1.matcher(form);
@@ -291,7 +280,7 @@ public class ChoiceUtilities {
     Matcher m = FORM_PATTERN.matcher(responseText);
     while (m.find()) {
       String form = m.group();
-      if (!form.contains("choice.php")) {
+      if (!form.contains(CHOICE_PHP)) {
         continue;
       }
       Matcher optMatcher = OPTION_PATTERN1.matcher(form);
@@ -345,7 +334,7 @@ public class ChoiceUtilities {
     Matcher m = FORM_PATTERN.matcher(responseText);
     while (m.find()) {
       String form = m.group();
-      if (!form.contains("choice.php")) {
+      if (!form.contains(CHOICE_PHP)) {
         continue;
       }
       Matcher optMatcher = OPTION_PATTERN1.matcher(form);
